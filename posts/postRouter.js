@@ -39,12 +39,18 @@ router.put("/:id", (req, res) => {
   const id = req.params.id;
   console.log("IN PUT:", body);
   postDb
+
     .getById(id)
     .then(post => {
       postDb
         .update(post.id, body)
         .then(updatedPost => {
-          res.status(200).json({ updatedPost });
+          if (body.text) {
+            res.status(200).json({ updatedPost });
+          } else {
+            console.log("THE TEXT:", body);
+            res.status(406).json({ errorMessage: "text content missing!" });
+          }
         })
         .catch(err => {
           res
@@ -71,6 +77,7 @@ function validatePostId(req, res, next) {
         console.log("New Body:", req.body);
         next();
       } else {
+        console.log("INCOMING POST:", post);
         res.status(400).json({ errorMessage: "invalid post id" });
       }
     })
